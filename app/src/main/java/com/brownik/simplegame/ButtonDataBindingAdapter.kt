@@ -1,6 +1,5 @@
 package com.brownik.simplegame
 
-import android.util.Log
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 

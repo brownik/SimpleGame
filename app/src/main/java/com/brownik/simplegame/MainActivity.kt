@@ -1,24 +1,25 @@
 package com.brownik.simplegame
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.brownik.simplegame.databinding.ActivityMainBinding
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var buttonStateViewModel: ButtonStateViewModel
-    private lateinit var buttonStateList: List<ButtonStateData>
+    private lateinit var remainTimeAndScoreViewModel: RemainTimeAndScoreViewModel
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
-        buttonStateList = makeButtonList()
         setGameLayerSideSize()
 
         buttonStateViewModel = ViewModelProvider(
@@ -27,21 +28,32 @@ class MainActivity : AppCompatActivity() {
         )[ButtonStateViewModel::class.java]
         setButtonStateLiveData()
 
-        buttonStateViewModel.setData(buttonStateList.toMutableList())
+        remainTimeAndScoreViewModel = ViewModelProvider(
+            this,
+            RemainTimeAndScoreViewModelFactory()
+        )[RemainTimeAndScoreViewModel::class.java]
+        setRemainTimeAndScoreLiveData()
+
+        buttonStateViewModel.initButtonStateData()
 
         addOnClickListener()
-
     }
 
     private fun addOnClickListener() = with(binding) {
         startButton.setOnClickListener {
-            buttonStateViewModel.setRandomData()
+
         }
     }
 
     private fun setButtonStateLiveData() = with(binding) {
         buttonStateViewModel.buttonStateData.observe(this@MainActivity, Observer {
             buttonState = buttonStateViewModel
+        })
+    }
+
+    private fun setRemainTimeAndScoreLiveData() = with(binding) {
+        remainTimeAndScoreViewModel.remainTime.observe(this@MainActivity, Observer {
+            invalidateAll()
         })
     }
 
@@ -54,18 +66,12 @@ class MainActivity : AppCompatActivity() {
         buttonLayer.layoutParams = layoutParams
     }
 
-    private fun makeButtonList(): List<ButtonStateData> {
-        return mutableListOf(
-            ButtonStateData(),
-            ButtonStateData(),
-            ButtonStateData(),
-            ButtonStateData(),
-            ButtonStateData(),
-            ButtonStateData(),
-            ButtonStateData(),
-            ButtonStateData(),
-            ButtonStateData(),
-        )
-    }
+    private suspend fun startGame() {
+        coroutineScope {
+            val job = CoroutineScope(Dispatchers.IO).launch {
+                buttonStateViewModel.changeImage()
+            }
+        }
 
+    }
 }

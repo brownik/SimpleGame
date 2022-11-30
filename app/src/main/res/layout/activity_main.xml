@@ -4,6 +4,10 @@
     <data>
 
         <variable
+            name="remainTimeAndScore"
+            type="com.brownik.simplegame.RemainTimeAndScoreViewModel" />
+
+        <variable
             name="buttonState"
             type="com.brownik.simplegame.ButtonStateViewModel" />
 
@@ -56,6 +60,7 @@
                 android:text="60초"
                 android:textColor="#576F72"
                 android:textSize="20dp"
+                app:setRemainTime="@{remainTimeAndScore.remainTime}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
