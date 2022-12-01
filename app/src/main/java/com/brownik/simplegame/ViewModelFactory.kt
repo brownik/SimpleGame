@@ -3,10 +3,10 @@ package com.brownik.simplegame
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
-class ButtonStateViewModelFactory : ViewModelProvider.Factory {
+class ViewModelFactory(private val viewModel: ViewModel) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return if (modelClass.isAssignableFrom(ButtonStateViewModel::class.java)) {
-            ButtonStateViewModel() as T
+        return if (modelClass.isAssignableFrom(viewModel::class.java)) {
+            viewModel as T
         } else {
             throw IllegalArgumentException()
         }

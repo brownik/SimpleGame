@@ -4,11 +4,11 @@
     <data>
 
         <variable
-            name="remainTimeAndScore"
-            type="com.brownik.simplegame.RemainTimeAndScoreViewModel" />
+            name="remainTimeDataBinding"
+            type="com.brownik.simplegame.RemainTimeViewModel" />
 
         <variable
-            name="buttonState"
+            name="buttonStateDataBinding"
             type="com.brownik.simplegame.ButtonStateViewModel" />
 
     </data>
@@ -23,7 +23,7 @@
         tools:context=".MainActivity">
 
         <Button
-            android:id="@+id/startButton"
+            android:id="@+id/gameButton"
             android:layout_width="100dp"
             android:layout_height="50dp"
             android:layout_marginTop="100dp"
@@ -39,13 +39,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
-            app:layout_constraintTop_toBottomOf="@id/startButton">
+            app:layout_constraintTop_toBottomOf="@id/gameButton">
 
             <TextView
                 android:id="@+id/totalScore"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="0"
+                android:text="0"
                 android:textColor="#576F72"
                 android:textSize="30dp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -57,10 +57,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="20dp"
-                android:text="60초"
+                android:text="remainTime"
                 android:textColor="#576F72"
                 android:textSize="20dp"
-                app:setRemainTime="@{remainTimeAndScore.remainTime}"
+                app:setRemainTime="@{remainTimeDataBinding.remainTime}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -85,7 +85,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="@dimen/white_space"
                 android:background="@color/white"
-                app:changeImageResource="@{buttonState.buttonStateData[0].buttonState}"/>
+                app:changeImageResource="@{buttonStateDataBinding.buttonStateData[0]}"/>
 
             <ImageView
                 android:id="@+id/button1"
@@ -95,7 +95,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="@dimen/white_space"
                 android:background="@color/white"
-                app:changeImageResource="@{buttonState.buttonStateData[1].buttonState}"/>
+                app:changeImageResource="@{buttonStateDataBinding.buttonStateData[1]}"/>
 
             <ImageView
                 android:id="@+id/button2"
@@ -105,7 +105,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="@dimen/white_space"
                 android:background="@color/white"
-                app:changeImageResource="@{buttonState.buttonStateData[2].buttonState}" />
+                app:changeImageResource="@{buttonStateDataBinding.buttonStateData[2]}" />
 
             <ImageView
                 android:id="@+id/button3"
@@ -115,7 +115,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="@dimen/white_space"
                 android:background="@color/white"
-                app:changeImageResource="@{buttonState.buttonStateData[3].buttonState}" />
+                app:changeImageResource="@{buttonStateDataBinding.buttonStateData[3]}" />
 
             <ImageView
                 android:id="@+id/button4"
@@ -125,7 +125,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="@dimen/white_space"
                 android:background="@color/white"
-                app:changeImageResource="@{buttonState.buttonStateData[4].buttonState}" />
+                app:changeImageResource="@{buttonStateDataBinding.buttonStateData[4]}" />
 
             <ImageView
                 android:id="@+id/button5"
@@ -135,7 +135,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="@dimen/white_space"
                 android:background="@color/white"
-                app:changeImageResource="@{buttonState.buttonStateData[5].buttonState}" />
+                app:changeImageResource="@{buttonStateDataBinding.buttonStateData[5]}" />
 
             <ImageView
                 android:id="@+id/button6"
@@ -145,7 +145,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="@dimen/white_space"
                 android:background="@color/white"
-                app:changeImageResource="@{buttonState.buttonStateData[6].buttonState}" />
+                app:changeImageResource="@{buttonStateDataBinding.buttonStateData[6]}" />
 
             <ImageView
                 android:id="@+id/button7"
@@ -155,7 +155,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="@dimen/white_space"
                 android:background="@color/white"
-                app:changeImageResource="@{buttonState.buttonStateData[7].buttonState}" />
+                app:changeImageResource="@{buttonStateDataBinding.buttonStateData[7]}" />
 
             <ImageView
                 android:id="@+id/button8"
@@ -165,7 +165,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="@dimen/white_space"
                 android:background="@color/white"
-                app:changeImageResource="@{buttonState.buttonStateData[8].buttonState}" />
+                app:changeImageResource="@{buttonStateDataBinding.buttonStateData[8]}" />
 
         </GridLayout>
 
