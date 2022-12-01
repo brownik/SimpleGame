@@ -1,6 +1,5 @@
 package com.brownik.simplegame
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -30,7 +29,6 @@ class ButtonStateViewModel : ViewModel() {
         val list = _buttonStateData.value?.toMutableList()
         val position = makeRandomPosition()
         val randomScore = makeRandomScore()
-        Log.d("qwe123", "position: ${position}, randomState: $randomScore")
         list?.let {
             if (it[position] == randomScore || randomScore == 0) changeImage()
             else it[position] = randomScore
@@ -39,6 +37,7 @@ class ButtonStateViewModel : ViewModel() {
     }
 
     fun onButtonClick(position: Int): Int {
+        MyObject.makeLog(position.toString())
         val score = when (_buttonStateData.value?.get(position)) {
             -5 -> -5
             -4 -> -4
