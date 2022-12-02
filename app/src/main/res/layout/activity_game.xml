@@ -49,12 +49,14 @@
                 android:id="@+id/totalScore"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="score"
                 android:textColor="#576F72"
                 android:textSize="30dp"
+                android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:setScore="@{scoreDataBinding.score}"/>
+                app:setScore="@{scoreDataBinding.score}" />
 
             <TextView
                 android:id="@+id/remainTime"
@@ -64,9 +66,45 @@
                 android:text="remainTime"
                 android:textColor="#576F72"
                 android:textSize="20dp"
-                app:setRemainTime="@{remainTimeDataBinding.remainTime}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:setRemainTime="@{remainTimeDataBinding.remainTime}" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toTopOf="@id/buttonLayer">
+
+            <TextView
+                android:id="@+id/minusAlert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:drawableStart="@drawable/small_minus_score"
+                android:drawablePadding="10dp"
+                android:gravity="center"
+                android:text=": 점수 - "
+                android:textSize="18dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/plusAlert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:drawableStart="@drawable/small_plus_score"
+                android:drawablePadding="10dp"
+                android:gravity="center"
+                android:text=": 점수 + "
+                android:textSize="18dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@id/minusAlert"
                 app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -89,7 +127,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="@dimen/white_space"
                 android:background="@color/white"
-                app:changeImageResource="@{buttonStateDataBinding.buttonScoreData[0]}"/>
+                app:changeImageResource="@{buttonStateDataBinding.buttonScoreData[0]}" />
 
             <ImageView
                 android:id="@+id/button1"
@@ -99,7 +137,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="@dimen/white_space"
                 android:background="@color/white"
-                app:changeImageResource="@{buttonStateDataBinding.buttonScoreData[1]}"/>
+                app:changeImageResource="@{buttonStateDataBinding.buttonScoreData[1]}" />
 
             <ImageView
                 android:id="@+id/button2"

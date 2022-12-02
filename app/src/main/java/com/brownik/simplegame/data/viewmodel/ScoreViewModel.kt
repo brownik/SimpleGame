@@ -33,7 +33,7 @@ class ScoreViewModel : ViewModel() {
             score?.let {
                 if (it > 0) {
                     scoreValueAnimatorChannel.send(plusAnimator(view))
-                } else {
+                } else if (it < 0) {
                     scoreObjectAnimatorChannel.send(minusAnimator(view))
                 }
             }

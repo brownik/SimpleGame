@@ -1,7 +1,5 @@
 package com.brownik.simplegame
 
-import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
@@ -15,6 +13,7 @@ import com.brownik.simplegame.data.viewmodel.ScoreViewModel
 import com.brownik.simplegame.data.viewmodelfactory.ViewModelFactory
 import com.brownik.simplegame.databinding.ActivityGameBinding
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 
 class GameActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -154,31 +153,43 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
     private fun startGame() = with(binding) {
         MyObject.makeLog("startGame function")
         isGaming = true
-        var gamingJob: Job? = null
         gameButton.text = "STOP"
         scoreViewModel.initScore()
 
-        // 타이머 및 게임 시작
+        // 게임 시작
         CoroutineScope(Dispatchers.IO).launch {
             MyObject.makeLog("startGame.game coroutine")
-            remainTimeViewModel.startTimer()
-            gamingJob = makeRandomButton()
+//            remainTimeViewModel.startTimerUseChannel()
+            buttonScoreViewModel.startGame()
         }
 
-        // 채널을 통해 true 값이 들어오면 타이머 및 게임 초기화
+        // 타이머 시작
+        CoroutineScope(Dispatchers.IO).launch {
+            remainTimeViewModel.startTimerUseFlow().takeWhile{
+                isGaming
+            }.collect{
+                remainTimeViewModel.setRemainTime(it)
+            }
+            stopGame()
+        }
+
+        /*// 채널을 통해 true 값이 들어오면 타이머 및 게임 초기화
         CoroutineScope(Dispatchers.IO).launch {
             if (remainTimeViewModel.timerChannel.receive()) {
                 MyObject.makeLog("startGame.stopState receive coroutine")
+                job.cancel()
                 stopGame()
                 gamingJob?.cancel()
             }
-        }
+        }*/
     }
 
     // 게임을 종료하는 함수
     private fun stopGame() = with(binding) {
-        remainTimeViewModel.stopTimer()
+//        remainTimeViewModel.stopTimerUseChannel()
+        buttonScoreViewModel.stopGame()
         buttonScoreViewModel.initButtonScoreBackground()
+        remainTimeViewModel.initTimer()
         isGaming = false
         gameButton.text = "START"
     }
@@ -195,5 +206,5 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     // 버튼을 바꾸기 위한 시간을 랜덤으로 정하는 함수
-    private fun makeRandomTime(): Long = (200..500).random().toLong()
+    private fun makeRandomTime(): Long = (0..500).random().toLong()
 }
