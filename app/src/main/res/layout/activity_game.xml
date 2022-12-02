@@ -5,15 +5,15 @@
 
         <variable
             name="scoreDataBinding"
-            type="com.brownik.simplegame.ScoreViewModel" />
+            type="com.brownik.simplegame.data.viewmodel.ScoreViewModel" />
 
         <variable
             name="remainTimeDataBinding"
-            type="com.brownik.simplegame.RemainTimeViewModel" />
+            type="com.brownik.simplegame.data.viewmodel.RemainTimeViewModel" />
 
         <variable
             name="buttonStateDataBinding"
-            type="com.brownik.simplegame.ButtonStateViewModel" />
+            type="com.brownik.simplegame.data.viewmodel.ButtonStateViewModel" />
 
     </data>
 
@@ -24,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/main"
-        tools:context=".MainActivity">
+        tools:context=".GameActivity">
 
         <Button
             android:id="@+id/gameButton"

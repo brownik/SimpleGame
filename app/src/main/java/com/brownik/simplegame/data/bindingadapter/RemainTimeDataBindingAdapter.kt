@@ -1,4 +1,4 @@
-package com.brownik.simplegame
+package com.brownik.simplegame.data.bindingadapter
 
 import android.widget.TextView
 import androidx.databinding.BindingAdapter

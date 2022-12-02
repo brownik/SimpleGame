@@ -4,21 +4,25 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import com.brownik.simplegame.databinding.ActivityMainBinding
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.brownik.simplegame.data.viewmodel.ButtonStateViewModel
+import com.brownik.simplegame.data.viewmodel.RemainTimeViewModel
+import com.brownik.simplegame.data.viewmodel.ScoreViewModel
+import com.brownik.simplegame.data.viewmodelfactory.ViewModelFactory
+import com.brownik.simplegame.databinding.ActivityGameBinding
 import kotlinx.coroutines.*
 
-class MainActivity : AppCompatActivity(), View.OnClickListener {
+class GameActivity : AppCompatActivity(), View.OnClickListener {
 
-    private lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityGameBinding
     private var buttonStateViewModel = ButtonStateViewModel()
     private var remainTimeViewModel = RemainTimeViewModel()
     private var scoreViewModel = ScoreViewModel()
     private var isGaming = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_game)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setGameLayerSideSize()
@@ -48,11 +52,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         // liveData 초기화
         buttonStateViewModel.initButtonStateData()
-        remainTimeViewModel.initRemainTime()
+        remainTimeViewModel.initTimer()
 
         setButtonOnClickListener()
         addOnClickListener()
-
     }
 
     // 시작 버튼 이벤트 세팅 함수
@@ -66,22 +69,21 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     // 버튼에 clickListener 세팅 함수
-    private fun setButtonOnClickListener() = with(binding){
-        button0.setOnClickListener(this@MainActivity)
-        button1.setOnClickListener(this@MainActivity)
-        button2.setOnClickListener(this@MainActivity)
-        button3.setOnClickListener(this@MainActivity)
-        button4.setOnClickListener(this@MainActivity)
-        button5.setOnClickListener(this@MainActivity)
-        button6.setOnClickListener(this@MainActivity)
-        button7.setOnClickListener(this@MainActivity)
-        button8.setOnClickListener(this@MainActivity)
+    private fun setButtonOnClickListener() = with(binding) {
+        button0.setOnClickListener(this@GameActivity)
+        button1.setOnClickListener(this@GameActivity)
+        button2.setOnClickListener(this@GameActivity)
+        button3.setOnClickListener(this@GameActivity)
+        button4.setOnClickListener(this@GameActivity)
+        button5.setOnClickListener(this@GameActivity)
+        button6.setOnClickListener(this@GameActivity)
+        button7.setOnClickListener(this@GameActivity)
+        button8.setOnClickListener(this@GameActivity)
     }
 
     // 숫자 버튼 이벤트 세팅 함수
     override fun onClick(view: View) = with(binding) {
-        MyObject.makeLog(view.id.toString())
-        val position = when(view){
+        val position = when (view) {
             button0 -> 0
             button1 -> 1
             button2 -> 2
@@ -97,26 +99,40 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         if (position != null) {
             score = buttonStateViewModel.onButtonClick(position)
         }
-        scoreViewModel.calculationScore(score)
+        scoreViewModel.totalScore(score, totalScore)
+        addScoreAnimator()
+    }
+
+    // scoreChannel에 쌓인 데이터를 받아 Animator를 start 해주는 함수
+    private fun addScoreAnimator() {
+        CoroutineScope(Dispatchers.Main).launch {
+            launch {
+                scoreViewModel.scoreValueAnimatorChannel.receive().start()
+            }
+
+            launch {
+                scoreViewModel.scoreObjectAnimatorChannel.receive().start()
+            }
+        }
     }
 
     // 버튼 상태 라이브데이터
     private fun setButtonStateLiveData() = with(binding) {
-        buttonStateViewModel.buttonStateData.observe(this@MainActivity, Observer {
+        buttonStateViewModel.buttonStateData.observe(this@GameActivity, Observer {
             buttonStateDataBinding = buttonStateViewModel
         })
     }
 
     // 타이머 라이브데이터
     private fun setRemainTimeLiveData() = with(binding) {
-        remainTimeViewModel.remainTime.observe(this@MainActivity, Observer {
+        remainTimeViewModel.remainTime.observe(this@GameActivity, Observer {
             remainTimeDataBinding = remainTimeViewModel
         })
     }
 
     // 점수 라이브데이터
     private fun setScoreLiveData() = with(binding) {
-        scoreViewModel.score.observe(this@MainActivity, Observer {
+        scoreViewModel.score.observe(this@GameActivity, Observer {
             scoreDataBinding = scoreViewModel
         })
     }
@@ -156,7 +172,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    // 게임을 멈추는 함수
+    // 게임을 종료하는 함수
     private fun stopGame() = with(binding) {
         remainTimeViewModel.stopTimer()
         buttonStateViewModel.initButtonBackground()
@@ -164,7 +180,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         gameButton.text = "START"
     }
 
-    // 버튼을 계속해서 바꾸는 함수
+    // 게임이 종료될 때까지 버튼을 바꾸는 함수
     private suspend fun makeRandomButton() = coroutineScope {
         MyObject.makeLog("makeRandomButton")
         launch {

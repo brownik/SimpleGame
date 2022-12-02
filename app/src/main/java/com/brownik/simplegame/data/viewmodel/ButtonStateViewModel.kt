@@ -1,4 +1,4 @@
-package com.brownik.simplegame
+package com.brownik.simplegame.data.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,15 +8,12 @@ class ButtonStateViewModel : ViewModel() {
     private var _buttonStateData = MutableLiveData<List<Int>>()
     val buttonStateData: LiveData<List<Int>> = _buttonStateData
 
-    fun setData(data: MutableList<Int>) {
-        _buttonStateData.value = data.toList()
-    }
-
     // 버튼 상태 초기화
     fun initButtonStateData() {
         _buttonStateData.value = MutableList(9) { 0 }.toList()
     }
 
+    // 백그라운드에서 버튼 상태 초기화
     fun initButtonBackground() {
         _buttonStateData.postValue(MutableList(9) { 0 }.toList())
     }
@@ -31,14 +28,15 @@ class ButtonStateViewModel : ViewModel() {
         val position = makeRandomPosition()
         val randomScore = makeRandomScore()
         list?.let {
+            if((it[position] > 0 && randomScore > 0) || it[position] < 0 && randomScore < 0) changeImage()
             if (it[position] == randomScore || randomScore == 0) changeImage()
             else it[position] = randomScore
         }
         _buttonStateData.postValue(list?.toList())
     }
 
+    // 버튼 클릭 시 점수 반환
     fun onButtonClick(position: Int): Int {
-        MyObject.makeLog(position.toString())
         val score = when (_buttonStateData.value?.get(position)) {
             -5 -> -5
             -4 -> -4
@@ -56,15 +54,16 @@ class ButtonStateViewModel : ViewModel() {
         return score
     }
 
+    // 버튼 초기화 함수
     private fun initOneButton(position: Int) {
-        MyObject.makeLog("initOneButton")
         val list = _buttonStateData.value?.toMutableList()
         list?.let {
             it[position] = 0
         }
         _buttonStateData.postValue(list?.toList())
     }
-
+    
+    // 점수 확률을 나눈 리스트
     private fun makeRandomScoreList(): List<Int> {
         val list = mutableListOf<Int>()
         list.addAll(MutableList(1) { -5 })

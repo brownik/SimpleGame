@@ -1,7 +1,8 @@
-package com.brownik.simplegame
+package com.brownik.simplegame.data.bindingadapter
 
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
+import com.brownik.simplegame.R
 
 object ButtonDataBindingAdapter {
     @BindingAdapter("app:changeImageResource")
