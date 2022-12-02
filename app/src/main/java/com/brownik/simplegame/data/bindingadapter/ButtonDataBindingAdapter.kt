@@ -7,8 +7,8 @@ import com.brownik.simplegame.R
 object ButtonDataBindingAdapter {
     @BindingAdapter("app:changeImageResource")
     @JvmStatic
-    fun changeImageResource(targetView: ImageView, state: Int) {
-        val image = when(state){
+    fun changeButtonScore(targetView: ImageView, state: Int) {
+        val image = when (state) {
             -5 -> R.drawable.minus_5
             -4 -> R.drawable.minus_4
             -3 -> R.drawable.minus_3

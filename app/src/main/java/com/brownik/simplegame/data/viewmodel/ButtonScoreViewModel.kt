@@ -4,40 +4,46 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class ButtonStateViewModel : ViewModel() {
-    private var _buttonStateData = MutableLiveData<List<Int>>()
-    val buttonStateData: LiveData<List<Int>> = _buttonStateData
+class ButtonScoreViewModel : ViewModel() {
+    private var _buttonScoreData = MutableLiveData<List<Int>>()
+    val buttonScoreData: LiveData<List<Int>> = _buttonScoreData
+
+
 
     // 버튼 상태 초기화
-    fun initButtonStateData() {
-        _buttonStateData.value = MutableList(9) { 0 }.toList()
+    fun initButtonScoreData() {
+        _buttonScoreData.value = MutableList(9) { 0 }.toList()
     }
 
     // 백그라운드에서 버튼 상태 초기화
-    fun initButtonBackground() {
-        _buttonStateData.postValue(MutableList(9) { 0 }.toList())
+    fun initButtonScoreBackground() {
+        _buttonScoreData.postValue(MutableList(9) { 0 }.toList())
     }
 
     private fun makeRandomPosition(): Int = (0..8).random()
 
-    private fun makeRandomScore(): Int = makeRandomScoreList().random()
+    private fun makeRandomScore(): Int {
+        var score = 0
+        while (score == 0) score = makeRandomScoreList().random()
+        return score
+    }
 
     // 버튼 상태 바꾸기
-    fun changeImage() {
-        val list = _buttonStateData.value?.toMutableList()
+    fun changeButtonScore() {
+        val list = _buttonScoreData.value?.toMutableList()
         val position = makeRandomPosition()
         val randomScore = makeRandomScore()
         list?.let {
-            if((it[position] > 0 && randomScore > 0) || it[position] < 0 && randomScore < 0) changeImage()
-            if (it[position] == randomScore || randomScore == 0) changeImage()
+            if ((it[position] > 0 && randomScore > 0) || it[position] < 0 && randomScore < 0) changeButtonScore()
+            if (it[position] == randomScore) changeButtonScore()
             else it[position] = randomScore
         }
-        _buttonStateData.postValue(list?.toList())
+        _buttonScoreData.postValue(list?.toList())
     }
 
     // 버튼 클릭 시 점수 반환
     fun onButtonClick(position: Int): Int {
-        val score = when (_buttonStateData.value?.get(position)) {
+        val score = when (_buttonScoreData.value?.get(position)) {
             -5 -> -5
             -4 -> -4
             -3 -> -3
@@ -56,13 +62,13 @@ class ButtonStateViewModel : ViewModel() {
 
     // 버튼 초기화 함수
     private fun initOneButton(position: Int) {
-        val list = _buttonStateData.value?.toMutableList()
+        val list = _buttonScoreData.value?.toMutableList()
         list?.let {
             it[position] = 0
         }
-        _buttonStateData.postValue(list?.toList())
+        _buttonScoreData.postValue(list?.toList())
     }
-    
+
     // 점수 확률을 나눈 리스트
     private fun makeRandomScoreList(): List<Int> {
         val list = mutableListOf<Int>()

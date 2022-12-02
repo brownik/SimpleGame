@@ -1,12 +1,15 @@
 package com.brownik.simplegame
 
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.brownik.simplegame.data.viewmodel.ButtonStateViewModel
+import com.brownik.simplegame.data.viewmodel.ButtonScoreViewModel
 import com.brownik.simplegame.data.viewmodel.RemainTimeViewModel
 import com.brownik.simplegame.data.viewmodel.ScoreViewModel
 import com.brownik.simplegame.data.viewmodelfactory.ViewModelFactory
@@ -16,7 +19,7 @@ import kotlinx.coroutines.*
 class GameActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var binding: ActivityGameBinding
-    private var buttonStateViewModel = ButtonStateViewModel()
+    private var buttonScoreViewModel = ButtonScoreViewModel()
     private var remainTimeViewModel = RemainTimeViewModel()
     private var scoreViewModel = ScoreViewModel()
     private var isGaming = false
@@ -27,13 +30,13 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(binding.root)
         setGameLayerSideSize()
 
-        // buttonState 뷰 모델 설정
-        buttonStateViewModel = ViewModelProvider(
+        // buttonScoreViewModel 설정
+        buttonScoreViewModel = ViewModelProvider(
             this,
-            ViewModelFactory(buttonStateViewModel)
-        )[ButtonStateViewModel::class.java]
+            ViewModelFactory(buttonScoreViewModel)
+        )[ButtonScoreViewModel::class.java]
 
-        // remainTime 뷰 모델 설정
+        // remainTimeViewModel 설정
         remainTimeViewModel = ViewModelProvider(
             this,
             ViewModelFactory(remainTimeViewModel)
@@ -46,12 +49,12 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
         )[ScoreViewModel::class.java]
 
         // LiveData 등록
-        setButtonStateLiveData()
+        setButtonScoreLiveData()
         setRemainTimeLiveData()
         setScoreLiveData()
 
         // liveData 초기화
-        buttonStateViewModel.initButtonStateData()
+        buttonScoreViewModel.initButtonScoreData()
         remainTimeViewModel.initTimer()
 
         setButtonOnClickListener()
@@ -97,29 +100,29 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
         }
         var score = 0
         if (position != null) {
-            score = buttonStateViewModel.onButtonClick(position)
+            score = buttonScoreViewModel.onButtonClick(position)
         }
         scoreViewModel.totalScore(score, totalScore)
         addScoreAnimator()
     }
 
     // scoreChannel에 쌓인 데이터를 받아 Animator를 start 해주는 함수
+    @SuppressLint("Recycle")
     private fun addScoreAnimator() {
         CoroutineScope(Dispatchers.Main).launch {
             launch {
                 scoreViewModel.scoreValueAnimatorChannel.receive().start()
             }
-
             launch {
                 scoreViewModel.scoreObjectAnimatorChannel.receive().start()
             }
         }
     }
 
-    // 버튼 상태 라이브데이터
-    private fun setButtonStateLiveData() = with(binding) {
-        buttonStateViewModel.buttonStateData.observe(this@GameActivity, Observer {
-            buttonStateDataBinding = buttonStateViewModel
+    // 버튼 점수 라이브데이터
+    private fun setButtonScoreLiveData() = with(binding) {
+        buttonScoreViewModel.buttonScoreData.observe(this@GameActivity, Observer {
+            buttonStateDataBinding = buttonScoreViewModel
         })
     }
 
@@ -155,14 +158,14 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
         gameButton.text = "STOP"
         scoreViewModel.initScore()
 
-        // 타이머 및 게임 시작 코루틴
+        // 타이머 및 게임 시작
         CoroutineScope(Dispatchers.IO).launch {
             MyObject.makeLog("startGame.game coroutine")
             remainTimeViewModel.startTimer()
             gamingJob = makeRandomButton()
         }
 
-        // 채널을 통해 true 값이 들어오면 타이머 및 게임 리셋
+        // 채널을 통해 true 값이 들어오면 타이머 및 게임 초기화
         CoroutineScope(Dispatchers.IO).launch {
             if (remainTimeViewModel.timerChannel.receive()) {
                 MyObject.makeLog("startGame.stopState receive coroutine")
@@ -175,7 +178,7 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
     // 게임을 종료하는 함수
     private fun stopGame() = with(binding) {
         remainTimeViewModel.stopTimer()
-        buttonStateViewModel.initButtonBackground()
+        buttonScoreViewModel.initButtonScoreBackground()
         isGaming = false
         gameButton.text = "START"
     }
@@ -185,7 +188,7 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
         MyObject.makeLog("makeRandomButton")
         launch {
             while (isGaming) {
-                buttonStateViewModel.changeImage()
+                buttonScoreViewModel.changeButtonScore()
                 delay(makeRandomTime())
             }
         }

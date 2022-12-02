@@ -13,7 +13,7 @@
 
         <variable
             name="buttonStateDataBinding"
-            type="com.brownik.simplegame.data.viewmodel.ButtonStateViewModel" />
+            type="com.brownik.simplegame.data.viewmodel.ButtonScoreViewModel" />
 
     </data>
 
@@ -89,7 +89,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="@dimen/white_space"
                 android:background="@color/white"
-                app:changeImageResource="@{buttonStateDataBinding.buttonStateData[0]}"/>
+                app:changeImageResource="@{buttonStateDataBinding.buttonScoreData[0]}"/>
 
             <ImageView
                 android:id="@+id/button1"
@@ -99,7 +99,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="@dimen/white_space"
                 android:background="@color/white"
-                app:changeImageResource="@{buttonStateDataBinding.buttonStateData[1]}"/>
+                app:changeImageResource="@{buttonStateDataBinding.buttonScoreData[1]}"/>
 
             <ImageView
                 android:id="@+id/button2"
@@ -109,7 +109,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="@dimen/white_space"
                 android:background="@color/white"
-                app:changeImageResource="@{buttonStateDataBinding.buttonStateData[2]}" />
+                app:changeImageResource="@{buttonStateDataBinding.buttonScoreData[2]}" />
 
             <ImageView
                 android:id="@+id/button3"
@@ -119,7 +119,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="@dimen/white_space"
                 android:background="@color/white"
-                app:changeImageResource="@{buttonStateDataBinding.buttonStateData[3]}" />
+                app:changeImageResource="@{buttonStateDataBinding.buttonScoreData[3]}" />
 
             <ImageView
                 android:id="@+id/button4"
@@ -129,7 +129,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="@dimen/white_space"
                 android:background="@color/white"
-                app:changeImageResource="@{buttonStateDataBinding.buttonStateData[4]}" />
+                app:changeImageResource="@{buttonStateDataBinding.buttonScoreData[4]}" />
 
             <ImageView
                 android:id="@+id/button5"
@@ -139,7 +139,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="@dimen/white_space"
                 android:background="@color/white"
-                app:changeImageResource="@{buttonStateDataBinding.buttonStateData[5]}" />
+                app:changeImageResource="@{buttonStateDataBinding.buttonScoreData[5]}" />
 
             <ImageView
                 android:id="@+id/button6"
@@ -149,7 +149,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="@dimen/white_space"
                 android:background="@color/white"
-                app:changeImageResource="@{buttonStateDataBinding.buttonStateData[6]}" />
+                app:changeImageResource="@{buttonStateDataBinding.buttonScoreData[6]}" />
 
             <ImageView
                 android:id="@+id/button7"
@@ -159,7 +159,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="@dimen/white_space"
                 android:background="@color/white"
-                app:changeImageResource="@{buttonStateDataBinding.buttonStateData[7]}" />
+                app:changeImageResource="@{buttonStateDataBinding.buttonScoreData[7]}" />
 
             <ImageView
                 android:id="@+id/button8"
@@ -169,7 +169,7 @@
                 android:layout_columnWeight="1"
                 android:layout_margin="@dimen/white_space"
                 android:background="@color/white"
-                app:changeImageResource="@{buttonStateDataBinding.buttonStateData[8]}" />
+                app:changeImageResource="@{buttonStateDataBinding.buttonScoreData[8]}" />
 
         </GridLayout>
 
