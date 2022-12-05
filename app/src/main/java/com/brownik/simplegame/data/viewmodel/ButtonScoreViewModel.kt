@@ -3,6 +3,8 @@ package com.brownik.simplegame.data.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.brownik.simplegame.MyObject
 import com.brownik.simplegame.data.model.ButtonDataModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -11,33 +13,43 @@ class ButtonScoreViewModel : ViewModel() {
     private var _buttonScoreData = MutableLiveData<List<Int>>()
     val buttonScoreData: LiveData<List<Int>> = _buttonScoreData
 
-    var isGaming = false
+    private var isGaming = false
+
+    init {
+        initButtonScoreData()
+    }
 
     // 버튼 상태 초기화
-    fun initButtonScoreData() {
+    private fun initButtonScoreData() {
         _buttonScoreData.value = MutableList(9) { 0 }.toList()
     }
 
-    // 백그라운드에서 버튼 상태 초기화
-    fun initButtonScoreBackground() {
+    // 버튼 상태 초기화(메인 쓰레드 X)
+    private fun initButtonScoreBackground() {
         _buttonScoreData.postValue(MutableList(9) { 0 }.toList())
     }
 
-    suspend fun startGame() = coroutineScope {
-        isGaming = true
-        CoroutineScope(Dispatchers.IO).launch {
-            changeButtonScoreUserFlow().collect { buttonData ->
+    fun changeGameState(isStartGame: Boolean) {
+        isGaming = isStartGame
+    }
+
+    fun startGame() {
+        changeButtonScoreUserFlow()
+            .onStart {
+                MyObject.makeLog("startGame.game flow onStart")
+            }.onEach { buttonData ->
                 val list = _buttonScoreData.value?.toMutableList()
                 list?.let { list ->
                     list[buttonData.position] = buttonData.score
                     _buttonScoreData.postValue(list.toList())
                 }
-            }
-        }
+            }.onCompletion {
+                MyObject.makeLog("startGame.game flow onCompletion")
+            }.launchIn(viewModelScope)
     }
 
     fun stopGame() {
-        isGaming = false
+        initButtonScoreBackground()
     }
 
     private fun makeRandomPosition(): Int = (0..8).random()
@@ -74,18 +86,12 @@ class ButtonScoreViewModel : ViewModel() {
 
     // 버튼 클릭 시 점수 반환
     fun onButtonClick(position: Int): Int {
-        val score = when (_buttonScoreData.value?.get(position)) {
-            -5 -> -5
-            -4 -> -4
-            -3 -> -3
-            -2 -> -2
-            -1 -> -1
-            1 -> +1
-            2 -> +2
-            3 -> +3
-            4 -> +4
-            5 -> +5
-            else -> 0
+        var score = 0
+        _buttonScoreData.value?.let {
+            score = when (_buttonScoreData.value?.get(position)) {
+                0 -> 0
+                else -> _buttonScoreData.value!![position]
+            }
         }
         initOneButton(position)
         return score

@@ -4,29 +4,51 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.brownik.simplegame.MyObject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 
 class RemainTimeViewModel : ViewModel() {
 
-    private var _remainTime = MutableLiveData<Int>()
+    private val baseGameTime = 5
+
+    private var _timerState = MutableStateFlow<TimerState>(TimerState.End)
+    val timerState = _timerState
+
+    private var _remainTime = MutableLiveData(baseGameTime)
     val remainTime: LiveData<Int> = _remainTime
 
     val timerChannel = Channel<Boolean>()
     private lateinit var timerTask: Job
     private lateinit var timerFlow: Flow<Int>
-    private val baseGameTime = 60
+
+    private var isGaming = false
 
     // 타이머 초기화
     fun initTimer() {
         _remainTime.postValue(baseGameTime)
     }
 
+    fun startTimer() {
+        (baseGameTime downTo 0)
+            .asFlow()
+            .takeWhile { isGaming }
+            .onStart { _timerState.emit(TimerState.Start) }
+            .onEach {
+                setRemainTime(it)
+                delay(1000L)
+            }.onCompletion { _timerState.emit(TimerState.End) }
+            .launchIn(viewModelScope)
+    }
+
+    fun changeGameState(isStartGame: Boolean) {
+        isGaming = isStartGame
+    }
+
     // remainTime 뷰를 업데이트 해주는 함수
-    fun setRemainTime(second: Int) {
-        _remainTime.postValue(second)
+    private fun setRemainTime(second: Int) {
+        _remainTime.value = second
     }
 
     // 타이머를 시작하는 함수
@@ -53,7 +75,7 @@ class RemainTimeViewModel : ViewModel() {
         setRemainTime(baseGameTime)
     }
 
-    fun startTimerUseFlow(): Flow<Int> {
+    private fun startTimerUseFlow(): Flow<Int> {
         timerFlow = flow {
             var currentRemainTime = baseGameTime
             while(currentRemainTime > 0) {
@@ -65,4 +87,9 @@ class RemainTimeViewModel : ViewModel() {
         }
         return timerFlow
     }
+}
+
+sealed class TimerState {
+    object Start: TimerState()
+    object End: TimerState()
 }

@@ -3,6 +3,7 @@ package com.brownik.simplegame
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -10,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.brownik.simplegame.data.viewmodel.ButtonScoreViewModel
 import com.brownik.simplegame.data.viewmodel.RemainTimeViewModel
 import com.brownik.simplegame.data.viewmodel.ScoreViewModel
+import com.brownik.simplegame.data.viewmodel.TimerState
 import com.brownik.simplegame.data.viewmodelfactory.ViewModelFactory
 import com.brownik.simplegame.databinding.ActivityGameBinding
 import kotlinx.coroutines.*
@@ -18,46 +20,40 @@ import kotlinx.coroutines.flow.*
 class GameActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var binding: ActivityGameBinding
-    private var buttonScoreViewModel = ButtonScoreViewModel()
-    private var remainTimeViewModel = RemainTimeViewModel()
-    private var scoreViewModel = ScoreViewModel()
+    private val buttonScoreViewModel: ButtonScoreViewModel by viewModels()
+    private val remainTimeViewModel: RemainTimeViewModel by viewModels()
+    private val scoreViewModel: ScoreViewModel by viewModels()
     private var isGaming = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_game)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        setViewModel()
+        collectViewModel()
         setGameLayerSideSize()
-
-        // buttonScoreViewModel 설정
-        buttonScoreViewModel = ViewModelProvider(
-            this,
-            ViewModelFactory(buttonScoreViewModel)
-        )[ButtonScoreViewModel::class.java]
-
-        // remainTimeViewModel 설정
-        remainTimeViewModel = ViewModelProvider(
-            this,
-            ViewModelFactory(remainTimeViewModel)
-        )[RemainTimeViewModel::class.java]
-
-        // scoreViewModel 뷰 모델 설정
-        scoreViewModel = ViewModelProvider(
-            this,
-            ViewModelFactory(scoreViewModel)
-        )[ScoreViewModel::class.java]
-
-        // LiveData 등록
-        setButtonScoreLiveData()
-        setRemainTimeLiveData()
-        setScoreLiveData()
-
-        // liveData 초기화
-        buttonScoreViewModel.initButtonScoreData()
-        remainTimeViewModel.initTimer()
-
         setButtonOnClickListener()
         addOnClickListener()
+    }
+
+    private fun setViewModel() {
+        binding.lifecycleOwner = this
+        binding.buttonStateDataBinding = buttonScoreViewModel
+        binding.remainTimeDataBinding = remainTimeViewModel
+        binding.scoreDataBinding = scoreViewModel
+    }
+
+    private fun collectViewModel() {
+        CoroutineScope(Dispatchers.IO).launch {
+            remainTimeViewModel.timerState.collect {
+                when (it) {
+                    is TimerState.Start -> {
+
+                    }
+                    is TimerState.End -> stopGame()
+                }
+            }
+        }
     }
 
     // 시작 버튼 이벤트 세팅 함수
@@ -118,27 +114,6 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    // 버튼 점수 라이브데이터
-    private fun setButtonScoreLiveData() = with(binding) {
-        buttonScoreViewModel.buttonScoreData.observe(this@GameActivity, Observer {
-            buttonStateDataBinding = buttonScoreViewModel
-        })
-    }
-
-    // 타이머 라이브데이터
-    private fun setRemainTimeLiveData() = with(binding) {
-        remainTimeViewModel.remainTime.observe(this@GameActivity, Observer {
-            remainTimeDataBinding = remainTimeViewModel
-        })
-    }
-
-    // 점수 라이브데이터
-    private fun setScoreLiveData() = with(binding) {
-        scoreViewModel.score.observe(this@GameActivity, Observer {
-            scoreDataBinding = scoreViewModel
-        })
-    }
-
     // 화면 비율에 맞춰 게임 Layer 크기를 맞추는 함수
     private fun setGameLayerSideSize() = with(binding) {
         val metrics = resources.displayMetrics
@@ -152,26 +127,12 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
     // 게임을 시작하는 함수
     private fun startGame() = with(binding) {
         MyObject.makeLog("startGame function")
-        isGaming = true
+        changeGameState(true)
         gameButton.text = "STOP"
         scoreViewModel.initScore()
-
-        // 게임 시작
-        CoroutineScope(Dispatchers.IO).launch {
-            MyObject.makeLog("startGame.game coroutine")
 //            remainTimeViewModel.startTimerUseChannel()
-            buttonScoreViewModel.startGame()
-        }
-
-        // 타이머 시작
-        CoroutineScope(Dispatchers.IO).launch {
-            remainTimeViewModel.startTimerUseFlow().takeWhile{
-                isGaming
-            }.collect{
-                remainTimeViewModel.setRemainTime(it)
-            }
-            stopGame()
-        }
+        buttonScoreViewModel.startGame()
+        remainTimeViewModel.startTimer()
 
         /*// 채널을 통해 true 값이 들어오면 타이머 및 게임 초기화
         CoroutineScope(Dispatchers.IO).launch {
@@ -187,11 +148,16 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
     // 게임을 종료하는 함수
     private fun stopGame() = with(binding) {
 //        remainTimeViewModel.stopTimerUseChannel()
+        changeGameState(false)
         buttonScoreViewModel.stopGame()
-        buttonScoreViewModel.initButtonScoreBackground()
         remainTimeViewModel.initTimer()
-        isGaming = false
         gameButton.text = "START"
+    }
+
+    private fun changeGameState(isStartGame: Boolean) {
+        isGaming = isStartGame
+        buttonScoreViewModel.changeGameState(isStartGame)
+        remainTimeViewModel.changeGameState(isStartGame)
     }
 
     // 게임이 종료될 때까지 버튼을 바꾸는 함수
